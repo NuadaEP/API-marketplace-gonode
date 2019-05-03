@@ -8,13 +8,18 @@ const AuthMiddlewares = require('./app/middlewares/auth')
 // Require controllers
 const controllers = require('./app/controllers')
 
-// Uses
-
 // Routes
 routes.post('/users', controllers.UserController.store)
 routes.post('/sessions', controllers.SessionController.store)
 
-routes.get('/teste', AuthMiddlewares, (req, res) => res.json({ ok: true }))
+routes.use(AuthMiddlewares)
+
+// Ads rotues
+routes.get('/ads', controllers.AdController.index)
+routes.get('/ads/:id', controllers.AdController.show)
+routes.post('/ads', controllers.AdController.create)
+routes.put('/ads/:id', controllers.AdController.update)
+routes.delete('/ads/:id', controllers.AdController.destroy)
 
 routes.get('/', (req, res) => res.send('Everything is working'))
 
