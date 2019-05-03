@@ -6,14 +6,13 @@ const routes = express.Router()
 const AuthMiddlewares = require('./app/middlewares/auth')
 
 // Require controllers
-const UserController = require('./app/controllers/UserController')
-const SessionController = require('./app/controllers/SessionController')
+const controllers = require('./app/controllers')
 
 // Uses
 
 // Routes
-routes.post('/users', UserController.store)
-routes.post('/sessions', SessionController.store)
+routes.post('/users', controllers.UserController.store)
+routes.post('/sessions', controllers.SessionController.store)
 
 routes.get('/teste', AuthMiddlewares, (req, res) => res.json({ ok: true }))
 
