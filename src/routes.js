@@ -21,6 +21,9 @@ routes.post('/ads', controllers.AdController.store)
 routes.put('/ads/:id', controllers.AdController.update)
 routes.delete('/ads/:id', controllers.AdController.destroy)
 
+// Purchase routes
+routes.post('/purchase', controllers.PurchaseController.store)
+
 routes.get('/', (req, res) => res.send('Everything is working'))
 
 module.exports = routes
