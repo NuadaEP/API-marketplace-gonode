@@ -1,66 +1,67 @@
-require('dotenv').config()
+require("dotenv").config();
 
-const express = require('express')
-const mongoose = require('mongoose')
-const validate = require('express-validation')
-const Youch = require('youch')
-const Sentry = require('@sentry/node')
-const databaseConfig = require('./config/database')
-const sentryConfig = require('./config/sentry')
+const express = require("express");
+const mongoose = require("mongoose");
+const validate = require("express-validation");
+const Youch = require("youch");
+const Sentry = require("@sentry/node");
+const databaseConfig = require("./config/database");
+const sentryConfig = require("./config/sentry");
 
 class App {
-  constructor () {
-    this.express = express()
-    this.isDev = process.env.NODE_ENV !== 'production'
+  constructor() {
+    this.express = express();
+    this.isDev = process.env.NODE_ENV !== "production";
 
-    this.sentry()
-    this.database()
-    this.middwares()
-    this.routes()
-    this.exception()
+    this.sentry();
+    this.database();
+    this.middwares();
+    this.routes();
+    this.exception();
   }
 
-  sentry () {
-    Sentry.init(sentryConfig)
+  sentry() {
+    Sentry.init(sentryConfig);
   }
 
-  database () {
+  database() {
     mongoose.connect(databaseConfig.uri, {
       useCreateIndex: true,
-      useNewUrlParser: true
-    })
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
   }
 
-  middwares () {
-    this.express.use(express.json())
-    this.express.use(Sentry.Handlers.requestHandler())
+  middwares() {
+    this.express.use(express.json());
+    this.express.use(Sentry.Handlers.requestHandler());
   }
 
-  routes () {
-    this.express.use(require('./routes'))
+  routes() {
+    this.express.use(require("./routes"));
   }
 
-  exception () {
-    if (process.env.NODE_ENV == 'production') {
-      this.express.use(Sentry.Handlers.errorHandler())
+  exception() {
+    if (process.env.NODE_ENV == "production") {
+      this.express.use(Sentry.Handlers.errorHandler());
     }
 
     this.express.use(async (err, req, res, next) => {
       if (err instanceof validate.ValidationError) {
-        return res.status(err.status).json(err)
+        return res.status(err.status).json(err);
       }
 
-      if (process.env.NODE_ENV != 'production') {
-        const youch = new Youch(err)
+      if (process.env.NODE_ENV != "production") {
+        const youch = new Youch(err);
 
-        return res.json(await youch.toJSON())
+        return res.json(await youch.toJSON());
       }
 
       return res
         .status(err.status || 500)
-        .json({ error: 'Internal Server Error' })
-    })
+        .json({ error: "Internal Server Error" });
+    });
   }
 }
 
-module.exports = new App().express
+module.exports = new App().express;
